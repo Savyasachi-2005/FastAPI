@@ -28,3 +28,6 @@ class showBlog(BaseModel):
     class config:
         from_attributes=True
         
+class Login(BaseModel):
+    username:str
+    password:str
