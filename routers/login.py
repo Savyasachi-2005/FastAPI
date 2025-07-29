@@ -21,4 +21,5 @@ def login(request:OAuth2PasswordRequestForm=Depends(),db:Session=Depends(get_db)
                             detail="Incorrect Password")
     
     access_token=JWTtoken.create_access_token(data={"sub":user.email})
-    return {"access_token": access_token,"token_type":"bearer"}
+    refresh_token=JWTtoken.create_refresh_tokens(data={"sub":user.email})
+    return {"access_token": access_token,"refresh_token":refresh_token,"token_type":"bearer"}
