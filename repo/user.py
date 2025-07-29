@@ -9,7 +9,7 @@ from db import get_db
 
 def create_user(request:schemas.users,db:Session=Depends(get_db)):
     hashed_pwd=hashing.Hash.bcrypt(request.password)
-    new_user=models.User(name=request.username,email=request.email,password=hashed_pwd)
+    new_user=models.User(name=request.username,email=request.email,password=hashed_pwd, role=request.role)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

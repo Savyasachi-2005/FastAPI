@@ -22,9 +22,10 @@ def verify_token(data:str,credentials_exception):
     try:
         payload=jwt.decode(data,SECRET_KEY,algorithms=[ALGORITHM])
         email:str = payload.get("sub")
+        role:str = payload.get("role")
         if email is None:
             raise credentials_exception
-        token_data = schemas.TokenData(email=email)
+        token_data = schemas.TokenData(username=email, role=role)
     except JWTError:
         raise credentials_exception
     return token_data
@@ -32,16 +33,20 @@ def verify_token(data:str,credentials_exception):
 def create_refresh_tokens(data:dict):
     to_encode=data.copy();
     expire=datetime.now(timezone.utc)+timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp":expire})
+    to_encode.update({
+        "exp":expire,
+        "role":data.get("role","user")
+        })
     return jwt.encode(to_encode,REFRESH_SECRET_KEY,algorithm=REFRESH_ALGORITHM)
 
 def verify_refresh_token(data:str,credentials_exception):
     try:
         payload=jwt.decode(data,REFRESH_SECRET_KEY,algorithms=[REFRESH_ALGORITHM])
-        email=payload.get("sub")
-        if email is None:
+        email:str=payload.get("sub")
+        role:str=payload.get("role")
+        if email is None or role is None:
             raise credentials_exception
-        return email
+        return schemas.TokenData(username=email, role=role)
     except jwt.JWTError:
         raise credentials_exception
     

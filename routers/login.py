@@ -20,6 +20,6 @@ def login(request:OAuth2PasswordRequestForm=Depends(),db:Session=Depends(get_db)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Incorrect Password")
     
-    access_token=JWTtoken.create_access_token(data={"sub":user.email})
-    refresh_token=JWTtoken.create_refresh_tokens(data={"sub":user.email})
-    return {"access_token": access_token,"refresh_token":refresh_token,"token_type":"bearer"}
+    access_token=JWTtoken.create_access_token(data={"sub":user.email,"role":user.role})
+    refresh_token=JWTtoken.create_refresh_tokens(data={"sub":user.email,"role":user.role})
+    return {"access_token": access_token,"refresh_token":refresh_token,"token_type":"bearer","role":user.role}

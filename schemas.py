@@ -12,12 +12,13 @@ class users(BaseModel):
     username:str
     email:str
     password:str
+    role:str="user"
     
 class userShow(BaseModel):
     name:str
     email:str
     id:int
-    blogs:List[BlogC]=[]
+    role:str="user"
     class Config:
         from_attributes=True
         
@@ -38,3 +39,4 @@ class Token(BaseModel):
     
 class TokenData(BaseModel):
     username: Optional[str]=None
+    role: Optional[str]=None
