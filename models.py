@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,ForeignKey,Table
+from sqlalchemy import Column,Integer,String,ForeignKey,Table,Boolean
 from db import base
 from sqlalchemy.orm import relationship
 class Blog(base):
@@ -16,6 +16,7 @@ class User(base):
     email=Column(String,nullable=False,unique=True)
     password=Column(String,nullable=False)
     role=Column(String,default='user')
+    is_verified=Column(Boolean,default=False)
     blogs=relationship('Blog',back_populates='creator')
     
     hospital_management= relationship(
