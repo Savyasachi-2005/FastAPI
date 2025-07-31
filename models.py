@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,ForeignKey
+from sqlalchemy import Column,Integer,String,ForeignKey,Table
 from db import base
 from sqlalchemy.orm import relationship
 class Blog(base):
@@ -17,3 +17,27 @@ class User(base):
     password=Column(String,nullable=False)
     role=Column(String,default='user')
     blogs=relationship('Blog',back_populates='creator')
+    
+    hospital_management= relationship(
+        'Hospital',
+        secondary='doctor',
+        back_populates='doctors'
+    )
+    
+doctor_table = Table(
+    'doctor',
+    base.metadata,
+    Column('user_id',Integer, ForeignKey('users.id'), primary_key=True),
+    Column('hospital_id',Integer, ForeignKey('hospitals.id'), primary_key=True)
+)
+
+class Hospital(base):
+    __tablename__='hospitals'
+    id=Column(Integer,primary_key=True,index=True)
+    name=Column(String,nullable=False)
+    
+    doctors = relationship(
+        'User',
+        secondary=doctor_table,
+        back_populates='hospital_management'
+    )

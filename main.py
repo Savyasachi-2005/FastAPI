@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Depends
 from sqlalchemy.orm import Session
 from db import engine,get_db,base
-from routers import blog,user,login,refresh,admin
+from routers import blog,user,login,refresh,admin,hospitals,register
 from repo import user as user_repo
 import schemas,models
 app=FastAPI()
@@ -31,7 +31,7 @@ def create_default_users():
                 ),
                 db
             )
-            print("✅ Default users created successfully")
+            print("Default users created successfully")
     except Exception as e:
         print(f"Error creating default users: {e}")
         db.rollback()
@@ -40,8 +40,9 @@ def create_default_users():
 create_default_users()
 
 app.include_router(admin.apirouter)
+app.include_router(register.apirouter)
+app.include_router(login.apirouter)
 app.include_router(refresh.router)
 app.include_router(blog.router)
 app.include_router(user.router)
-app.include_router(login.apirouter)
-
+app.include_router(hospitals.router)

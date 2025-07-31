@@ -40,3 +40,12 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str]=None
     role: Optional[str]=None
+    
+class HospitalCreate(BaseModel):
+    name:str
+
+class HospitalResponse(BaseModel):
+    id:int
+    name:str
+    class Config:
+        from_attributes=True
