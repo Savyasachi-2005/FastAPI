@@ -6,12 +6,22 @@ from repo import user as user_repo
 import schemas,models
 from utils.exceptions import APIException
 from fastapi.responses import JSONResponse
-from core.middleware import LoggingMiddleware,HeaderMiddleware 
+from core.middleware import HeaderMiddleware ,CustomASGIMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 app=FastAPI()
 
 base.metadata.create_all(bind=engine)
-
-app.add_middleware(LoggingMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*",],
+    allow_headers=["*"]
+)
+app.add_middleware(TrustedHostMiddleware,
+                   allowed_hosts=["*"])
+app.add_middleware(CustomASGIMiddleware)
 app.add_middleware(HeaderMiddleware)
 @app.exception_handler(APIException)
 async def api_exception_handler(request, exc: APIException):
