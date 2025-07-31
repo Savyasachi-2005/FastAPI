@@ -6,12 +6,13 @@ from repo import user as user_repo
 import schemas,models
 from utils.exceptions import APIException
 from fastapi.responses import JSONResponse
-from core.middleware import LoggingMiddleware 
+from core.middleware import LoggingMiddleware,HeaderMiddleware 
 app=FastAPI()
 
 base.metadata.create_all(bind=engine)
 
 app.add_middleware(LoggingMiddleware)
+app.add_middleware(HeaderMiddleware)
 @app.exception_handler(APIException)
 async def api_exception_handler(request, exc: APIException):
     return JSONResponse(

@@ -10,3 +10,11 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         duration = time.time() - start_time
         print(f"Response: {response.status_code} in {duration:.2f}s")
         return response
+    
+class HeaderMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers['Sparsha-app-version'] = '1.0.0'
+        response.headers['Sparsha-app-name'] = 'Sparsha'
+        response.headers['Sparsha-app-developer'] = 'Abhishek Hiremath'
+        return response
