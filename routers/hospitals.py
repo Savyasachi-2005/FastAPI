@@ -4,6 +4,7 @@ from db import get_db
 from utils.exceptions import APIException
 from models import Hospital, User
 from schemas import HospitalCreate, HospitalResponse
+from core.rbac import require_role
 
 
 
@@ -12,7 +13,7 @@ router = APIRouter(
     tags=["Hospitals"]
 )
 @router.post("/",response_model=HospitalResponse)
-def create_hospital(request:HospitalCreate, db: Session = Depends(get_db)):
+def create_hospital(request:HospitalCreate, db: Session = Depends(get_db),current_user: User= Depends(require_role("admin"))):
     hospital=Hospital(name=request.name)
     db.add(hospital)
     db.commit()
@@ -20,7 +21,7 @@ def create_hospital(request:HospitalCreate, db: Session = Depends(get_db)):
     return hospital
 
 @router.get("/{hospital_id}/doctors/{user_id}")
-def get_hospital(hospital_id: int,user_id: int,db:Session = Depends(get_db)):
+def get_hospital(hospital_id: int,user_id: int,db:Session = Depends(get_db),current_user: User= Depends(require_role("admin"))):
     hospital=db.query(Hospital).filter(Hospital.id == hospital_id).first()
     if not hospital:
         raise APIException(404, "arrey bhai hospital nahi hai")
