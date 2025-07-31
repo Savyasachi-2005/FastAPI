@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 import models,db,schemas
 from models import Blog, User
-from fastapi import APIRouter,Depends,Response, status, HTTPException
+from fastapi import Depends,Response
+from utils.exceptions import APIException
 
 
 def create(request: schemas.Blog,db:Session = Depends(db.get_db)):
@@ -23,8 +24,7 @@ def create(request: schemas.Blog,db:Session = Depends(db.get_db)):
 def show(id,response:Response,db:Session=Depends(db.get_db)):
     blog=db.query(models.Blog).filter(models.Blog.id==id).first()
     if  not blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Blog with the id {id} is not found")
+        raise APIException(404,"Bhai blog nahi hai")
     return blog
 
 def destroy(id,db:Session=Depends(db.get_db)):
@@ -35,7 +35,6 @@ def destroy(id,db:Session=Depends(db.get_db)):
 def update(id,request:schemas.Blog,db:Session=Depends(db.get_db)):
     blog=db.query(models.Blog).filter(models.Blog.id==id).update({'title':request.title, 'body': request.body}, synchronize_session=False)
     if not blog:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Blog with the id {id} is not found")
+        raise APIException(404, f"Bhai blog with id {id} nahi hai")
     db.commit()
     return 'Updated successfully'

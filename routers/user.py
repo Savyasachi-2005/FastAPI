@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 import models,db,schemas,oauth2
 from models import Blog, User
 from db import get_db
-from passlib.context import CryptContext
 from repo import user as user_repo
 router=APIRouter(
     prefix="/users",

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db import get_db
+from utils.exceptions import APIException
 from models import Hospital, User
 from schemas import HospitalCreate, HospitalResponse
 
@@ -22,12 +23,12 @@ def create_hospital(request:HospitalCreate, db: Session = Depends(get_db)):
 def get_hospital(hospital_id: int,user_id: int,db:Session = Depends(get_db)):
     hospital=db.query(Hospital).filter(Hospital.id == hospital_id).first()
     if not hospital:
-        raise HTTPException(status_code = 404,detail="Hospital not found")
+        raise APIException(404, "arrey bhai hospital nahi hai")
     doctor = db.query(User).filter(User.id == user_id).first()
     if not doctor:
-        raise HTTPException(status_code=404, detail="Doctor not found")
+        raise APIException(404, "arrey bhai doctor nahi hai")
     if doctor.role != "doctor":
-        raise HTTPException(status_code=400, detail="User is not a doctor")
+        raise APIException(400, "arrey bhai user doctor nahi hai")
     if doctor not in hospital.doctors:
         hospital.doctors.append(doctor)
         db.commit()
