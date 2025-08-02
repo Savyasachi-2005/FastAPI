@@ -49,3 +49,11 @@ class HospitalResponse(BaseModel):
     name:str
     class Config:
         from_attributes=True
+        
+class passwordResetRequest(BaseModel):
+    email:str
+
+class passwordResetConfirm(BaseModel):
+    token:str
+    new_password:str
+    
