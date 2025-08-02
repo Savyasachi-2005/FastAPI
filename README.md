@@ -1,41 +1,53 @@
 # FastAPI
 
-A fast and efficient web API server built using [FastAPI](https://fastapi.tiangolo.com/).  
-This repository serves as a starter template and learning project for building scalable, production-ready RESTful APIs with Python.
+A robust, feature-rich API server built using [FastAPI](https://fastapi.tiangolo.com/) with advanced authentication, role-based access control, and hospital management capabilities.  
+This repository provides a production-ready foundation for building secure, scalable RESTful APIs with Python.
 
 ---
 
 ## 🚦 What This Repository Contains
 
-This FastAPI starter template provides everything you need to build scalable, production-ready RESTful APIs with Python.  
-Below is a summary of the main components and features provided:
+This FastAPI application provides comprehensive features for building enterprise-grade APIs with Python.  
+Below is a summary of the main components and features:
 
 ### 🗂️ Main Components
 
-- **main.py**: Entry point for the FastAPI application; sets up the app and includes routers for blog, user, and login functionalities.
+- **main.py**: Entry point for the FastAPI application; configures middleware, exception handling, and includes all routers.
 - **app/**: Houses application modules:
-  - **routers/**: API route definitions (e.g., `blog.py`, `user.py`, `login.py`)
-  - **models/**: SQLAlchemy ORM models for `User` and `Blog`
-- **repo/**: Contains the logic for blog and user operations (CRUD functionality).
+  - **routers/**: API route definitions (user, hospital, authentication)
+  - **models/**: SQLAlchemy ORM models for User, Hospital, etc.
+  - **middleware/**: Custom middleware components
+- **repo/**: Contains the logic for user, hospital, and authentication operations.
 - **schemas.py**: Pydantic models for request/response data validation and serialization.
-- **db.py**: Database configuration and session creation.
-- **hashing.py**: Password hashing utilities (bcrypt).
+- **db.py**: Database configuration and session management.
+- **utils/**: 
+  - **hashing.py**: Password hashing utilities
+  - **auth.py**: Authentication utilities for JWT and OAuth2
+  - **email.py**: Email verification utilities
+- **exceptions.py**: Custom exception handling
 - **requirements.txt**: Python dependencies.
-- **README.md**: Setup instructions, usage, features, and project structure.
 
 ---
 
 ## 🌟 Features
 
-- **High performance**: Powered by Starlette and Uvicorn for asynchronous request handling.
-- **Automatic validation**: Data validation using Pydantic models.
-- **Interactive API docs**: Swagger UI and ReDoc built-in.
-- **Type hints**: Full support for Python type hints for better code clarity and editor assistance.
-- **Extensible**: Easily add authentication, database, and more.
-- **User Management**: Create, fetch, and manage users with password hashing and validation.
-- **Blog CRUD**: Create, read, update, and delete blog posts, linked to users.
-- **Authentication Structure**: Foundation to add authentication (token-based, etc.).
-- **Scalable Structure**: Modular design so you can easily add more routers, models, and services.
+- **High Performance**: Powered by Starlette and Uvicorn for asynchronous request handling.
+- **Authentication & Security**:
+  - JWT-based authentication with access and refresh tokens
+  - OAuth2 integration
+  - Password hashing and validation
+  - Email verification system
+- **Role-Based Access Control**: Granular permissions management for different user types (admin, regular users).
+- **Advanced Middleware**:
+  - CustomASGIMiddleware for request processing
+  - HeaderMiddleware for custom response headers
+  - Request/response logging
+- **Hospital Management**: Complete CRUD operations for hospital resources with role-based restrictions.
+- **User Management**: Comprehensive user account system with email verification.
+- **Exception Handling**: Custom APIException framework for consistent error responses.
+- **Interactive API Docs**: Swagger UI and ReDoc built-in.
+- **Type Hints**: Full support for Python type hints for better code clarity and editor assistance.
+- **Scalable Architecture**: Modular design for easy extension and maintenance.
 
 ---
 
@@ -45,6 +57,7 @@ Below is a summary of the main components and features provided:
 
 - Python 3.8+
 - [pip](https://pip.pypa.io/en/stable/)
+- SQL database (SQLite for development, PostgreSQL recommended for production)
 
 ### Installation
 
@@ -54,7 +67,7 @@ Below is a summary of the main components and features provided:
     cd FastAPI
     ```
 
-2. **Create and activate a virtual environment (optional but recommended):**
+2. **Create and activate a virtual environment:**
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -63,6 +76,20 @@ Below is a summary of the main components and features provided:
 3. **Install dependencies:**
     ```bash
     pip install -r requirements.txt
+    ```
+
+4. **Configure environment variables:**
+   Create a `.env` file in the root directory with:
+    ```
+    SECRET_KEY=your_secret_key
+    ALGORITHM=HS256
+    ACCESS_TOKEN_EXPIRE_MINUTES=30
+    REFRESH_TOKEN_EXPIRE_DAYS=7
+    EMAIL_HOST=smtp.example.com
+    EMAIL_PORT=587
+    EMAIL_USERNAME=your_email@example.com
+    EMAIL_PASSWORD=your_email_password
+    DATABASE_URL=sqlite:///./app.db
     ```
 
 ### Running the API Server
@@ -82,30 +109,100 @@ uvicorn main:app --reload
 
 ```
 FastAPI/
-├── main.py              # Entry point for FastAPI app
-├── requirements.txt     # Python dependencies
-├── app/                 # Application modules (routers, models, services, etc.)
-│   ├── routers/
-│   ├── models/
-│   └── ...
-├── repo/                # Implementation logic for blog and user operations
-├── schemas.py           # Pydantic models for serialization & validation
-├── db.py                # Database config and session management
-├── hashing.py           # Password hashing utilities
+├── main.py                # Entry point for FastAPI app
+├── requirements.txt       # Python dependencies
+├── app/                   # Application modules
+│   ├── routers/           # API route definitions
+│   │   ├── user.py
+│   │   ├── hospital.py
+│   │   └── auth.py
+│   ├── models/            # SQLAlchemy models
+│   │   ├── user.py
+│   │   └── hospital.py
+│   └── middleware/        # Custom middleware components
+│       ├── headers.py
+│       └── logging.py
+├── repo/                  # Business logic implementation
+├── schemas.py             # Pydantic models
+├── db.py                  # Database configuration
+├── utils/                 # Utility functions
+│   ├── hashing.py         # Password hashing
+│   ├── auth.py            # JWT token handling
+│   └── email.py           # Email verification
+├── exceptions.py          # Custom exception handling
 └── README.md
 ```
 
 ---
 
+## 🔐 Authentication Flow
+
+The API uses a JWT-based authentication system:
+
+1. **Registration**: Users register with email, password, and other details.
+2. **Email Verification**: A verification token is sent to the user's email.
+3. **Login**: After email verification, users can login to receive access and refresh tokens.
+4. **Access Protected Routes**: Use the access token in the Authorization header.
+5. **Token Refresh**: When the access token expires, use the refresh token to get a new one.
+
+Example authentication header:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+---
+
+## 👥 User Roles and Permissions
+
+The API implements role-based access control with the following roles:
+
+- **Admin**: Full system access, including hospital management.
+- **Doctor**: Access to patient records and limited hospital data.
+- **Patient**: Access to personal records only.
+- **Guest**: Limited to public endpoints.
+
+---
+
+## 🏥 Hospital Management
+
+The hospital management system includes:
+
+- Hospital registration and management
+- Department organization
+- Staff assignment
+- Patient records
+- Appointment scheduling
+
+All operations are protected by role-based permissions.
+
+---
+
 ## 🧑‍💻 Example Usage
 
-- Make a GET request:
-    ```bash
-    curl http://127.0.0.1:8000/
-    ```
-- Explore the interactive docs at `/docs` for more endpoints.
-- Use the endpoints for user and blog CRUD operations:
-    - See `/users` and `/blogs` routes in the interactive docs.
+- Register a new user:
+  ```bash
+  curl -X POST "http://127.0.0.1:8000/users/" -H "Content-Type: application/json" -d '{"email": "user@example.com", "password": "securepassword", "name": "John Doe"}'
+  ```
+
+- Authenticate and get tokens:
+  ```bash
+  curl -X POST "http://127.0.0.1:8000/auth/token" -H "Content-Type: application/json" -d '{"username": "user@example.com", "password": "securepassword"}'
+  ```
+
+- Access protected endpoint:
+  ```bash
+  curl "http://127.0.0.1:8000/users/me" -H "Authorization: Bearer your_access_token"
+  ```
+
+- Refresh expired token:
+  ```bash
+  curl -X POST "http://127.0.0.1:8000/auth/refresh" -H "Content-Type: application/json" -d '{"refresh_token": "your_refresh_token"}'
+  ```
+
+- Create a hospital (admin only):
+  ```bash
+  curl -X POST "http://127.0.0.1:8000/hospitals/" -H "Authorization: Bearer your_access_token" -H "Content-Type: application/json" -d '{"name": "General Hospital", "address": "123 Main St", "contact_number": "555-1234"}'
+  ```
 
 ---
 
@@ -129,6 +226,8 @@ See the [LICENSE](LICENSE) file for details.
 - [Uvicorn](https://www.uvicorn.org/)
 - [Starlette](https://www.starlette.io/)
 - [Pydantic](https://docs.pydantic.dev/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [JWT](https://jwt.io/)
 
 ---
 
