@@ -18,3 +18,11 @@ def create_user(request:schemas.users,db:Session=Depends(get_db)):
 def get_user(db:Session=Depends(get_db)):
     user=db.query(models.User).all()
     return [schemas.userShow.from_orm(us) for us in user]
+
+def delete(user_id:int=None,db:Session=Depends(get_db)):
+    user=db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        return {"message":"User not found"}
+    db.delete(user)
+    db.commit()
+    return {"message": f"{user.name} deleted successfully"}

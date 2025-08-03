@@ -7,6 +7,7 @@ from db import get_db
 from JWTtoken import create_email_token
 from core.email_config import send_email
 import asyncio
+from celery_worker import send_email_task
 apirouter=APIRouter(
     prefix="/register",
     tags=["Login"]
@@ -29,12 +30,9 @@ async def register(request:schemas.users,db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     
-    try:
-        token= create_email_token(new_user.email)
-        verification_link = f"http://localhost:8000/verify-email?token={token}"
-        await send_email(email_to=new_user.email,verification_link=verification_link)
-        return {"message": f"User {new_user.name} registered successfully, role: {new_user.role}. Please check your email for verification."}
-    except Exception as e:
-        # If email fails, still create user but inform about email issue
-        return {"message": f"User {new_user.name} registered successfully, but email verification failed. Please contact support."}
+    
+    token= create_email_token(new_user.email)
+    send_email_task.delay(new_user.email,token)
+    return {"message": f"User {new_user.name} registered successfully, role: {new_user.role}. Please check your email for verification."}
+   
     

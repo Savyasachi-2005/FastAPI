@@ -1,7 +1,8 @@
+
 from fastapi import FastAPI,Depends,Request
 from sqlalchemy.orm import Session
 from db import engine,get_db,base
-from routers import blog,user,login,refresh,admin,hospitals,register,email_test,email_verify,password_reset_route
+from routers import blog,user,login,refresh,admin,hospitals,register,email_verify,password_reset_route,email
 from repo import user as user_repo
 import schemas,models
 from utils.exceptions import APIException
@@ -11,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from core.config import settings
 app=FastAPI()
+base.metadata.drop_all(bind=engine)
 base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
@@ -38,7 +40,7 @@ print("Loaded Email",settings.MAIL_USERNAME)
 app.include_router(admin.apirouter)
 app.include_router(register.apirouter)
 app.include_router(login.apirouter)
-app.include_router(email_test.apirouter)
+# app.include_router(email.router)
 app.include_router(email_verify.apirouter)
 app.include_router(password_reset_route.apirouter)
 app.include_router(refresh.router)

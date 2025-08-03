@@ -19,3 +19,7 @@ def create_user(request:schemas.users,db:Session=Depends(get_db),get_current_use
 @router.get('/',status_code=200,response_model=list[schemas.userShow])
 def get_user(db:Session=Depends(get_db),get_current_user: schemas.users =Depends(oauth2.get_current_user)):
     return user_repo.get_user(db);
+
+@router.delete('/{user_id}',status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id:int,db:Session=Depends(get_db)):
+    return user_repo.delete(user_id,db);
