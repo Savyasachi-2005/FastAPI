@@ -36,6 +36,16 @@ async def api_exception_handler(request, exc: APIException):
     )
 
 print("Loaded Email",settings.MAIL_USERNAME)
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.debug(f"Incoming request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.debug(f"Response status: {response.status_code}")
+    return response
 
 app.include_router(admin.apirouter)
 app.include_router(register.apirouter)
