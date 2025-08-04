@@ -11,8 +11,13 @@ from core.middleware import HeaderMiddleware ,CustomASGIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from core.config import settings
-app=FastAPI()
-base.metadata.drop_all(bind=engine)
+app = FastAPI(
+    title="Sparsha API",
+    description="API for stray animal emergency, adoption, and community tasks 🐾",
+    version="1.0.0"
+)
+
+# base.metadata.drop_all(bind=engine)
 base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
